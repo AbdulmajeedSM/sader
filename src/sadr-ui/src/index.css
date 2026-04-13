@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+
+:root {
+  font-family: 'Tajawal', system-ui, sans-serif;
+  direction: rtl;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #0f1117;
+  color: #e2e8f0;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Agent color palette */
+.agent-market     { --agent-color: #3b82f6; }
+.agent-compliance { --agent-color: #f59e0b; }
+.agent-document   { --agent-color: #8b5cf6; }
+.agent-logistics  { --agent-color: #06b6d4; }
+.agent-consensus  { --agent-color: #10b981; }
+
+/* Message bubble slide-in */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.message-enter {
+  animation: slideIn 0.35s ease-out forwards;
+}
+
+/* Consensus badge pulse */
+@keyframes consensusPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70%  { box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.consensus-badge {
+  animation: consensusPulse 1.5s ease-out 3;
+}
+
+/* Typing dots */
+@keyframes blink {
+  0%, 80%, 100% { opacity: 0; }
+  40%           { opacity: 1; }
+}
+.typing-dot:nth-child(1) { animation: blink 1.4s infinite 0s; }
+.typing-dot:nth-child(2) { animation: blink 1.4s infinite 0.2s; }
+.typing-dot:nth-child(3) { animation: blink 1.4s infinite 0.4s; }
+
+/* Vote bar fill */
+@keyframes fillBar {
+  from { width: 0; }
+  to   { width: var(--fill-w); }
+}
+.vote-bar-fill {
+  animation: fillBar 0.8s ease-out forwards;
+  width: var(--fill-w);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #1a1d2e; }
+::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }

@@ -7,7 +7,7 @@ namespace Sader.Api.Data;
 public class ConversationEntity
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
-    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public string CreatedAt { get; set; } = DateTimeOffset.UtcNow.ToString("o");
     public string Scenario { get; set; } = string.Empty;
     public string Status { get; set; } = "running"; // running | completed | failed
     public List<MessageEntity> Messages { get; set; } = [];
@@ -18,7 +18,7 @@ public class MessageEntity
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string ConversationId { get; set; } = string.Empty;
     public string MessageJson { get; set; } = string.Empty;
-    public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.UtcNow;
+    public string Timestamp { get; set; } = DateTimeOffset.UtcNow.ToString("o");
     public int OrderIndex { get; set; }
     public ConversationEntity? Conversation { get; set; }
 }

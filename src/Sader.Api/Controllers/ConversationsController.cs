@@ -63,7 +63,7 @@ public class ConversationsController : ControllerBase
                         {
                             ConversationId = conversationId,
                             MessageJson = StepJson.Serialize(message),
-                            Timestamp = message.Timestamp,
+                            Timestamp = message.Timestamp.ToString("o"),
                             OrderIndex = orderIndex++
                         });
                         await _db.SaveChangesAsync();
@@ -121,14 +121,13 @@ public class ConversationsController : ControllerBase
     public async Task<IActionResult> ListConversations(CancellationToken ct)
     {
         var convs = await _db.Conversations
-            .OrderByDescending(c => c.CreatedAt)
             .Take(20)
             .Select(c => new
             {
                 c.Id,
                 c.Scenario,
                 c.Status,
-                c.CreatedAt,
+                CreatedAt = c.CreatedAt.ToString(),
                 MessageCount = c.Messages.Count
             })
             .ToListAsync(ct);
