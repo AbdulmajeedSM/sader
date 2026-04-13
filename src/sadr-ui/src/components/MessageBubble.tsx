@@ -77,7 +77,7 @@ function getMessageBorderColor(intent: string): string {
 
 export default function MessageBubble({ message, index }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const cfg = AGENT_CONFIG[message.sender] ?? AGENT_CONFIG['MarketAgent'];
+  const cfg = AGENT_CONFIG[message.sender] ?? AGENT_CONFIG['marketAgent']!
   const intentMeta = INTENT_LABELS[message.intent] ?? { ar: message.intent, badge: message.intent.toUpperCase(), badgeClass: 'bg-slate-800 text-slate-300' };
   const summary = getMessageSummary(message);
   const borderColor = getMessageBorderColor(message.intent);
@@ -100,7 +100,7 @@ export default function MessageBubble({ message, index }: Props) {
           <span className={`text-sm font-medium ${cfg.color}`}>{cfg.nameAr}</span>
           <span className="text-slate-600 text-xs">←</span>
           <span className="text-slate-400 text-xs">
-            {AGENT_CONFIG[message.receiver]?.nameAr ?? message.receiver === 'Broadcast' ? 'الكل' : message.receiver}
+            {AGENT_CONFIG[message.receiver]?.nameAr ?? (message.receiver === 'broadcast' || message.receiver === 'Broadcast' ? 'الكل' : message.receiver)}
           </span>
         </div>
         <span className={`text-xs font-mono px-2 py-0.5 rounded ${intentMeta.badgeClass}`}>

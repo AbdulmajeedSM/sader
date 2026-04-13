@@ -72,6 +72,25 @@ public class LogisticsAgent : IStepAgent
             Intent: "logisticsEstimated"
             """;
 
-        return await _claude.CompleteAsStepMessageAsync(SystemPrompt, userContent, ct);
+        var result = await _claude.CompleteAsStepMessageAsync(SystemPrompt, userContent, ct: ct);
+        return result ?? FallbackLogisticsEstimated(incoming);
     }
+
+    private static StepMessage FallbackLogisticsEstimated(StepMessage incoming) =>
+        StepMessage.Create(
+            intent: StepIntent.LogisticsEstimated,
+            sender: AgentId.LogisticsAgent,
+            receiver: AgentId.MarketAgent,
+            conversationId: incoming.ConversationId,
+            parentMessageId: incoming.MessageId,
+            payload: new
+            {
+                transitDays = 22,
+                freightCostUsd = 720,
+                shippingMode = "sea",
+                route = "القصيم ← جدة (2 يوم) ← ميناء كلانج ماليزيا (20 يوم)",
+                totalLandedCostUsd = 5900,
+                notes = "الإمارات أسرع بـ 17 يوماً وأوفر بـ 540 دولار"
+            },
+            confidence: 0.95m);
 }

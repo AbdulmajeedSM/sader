@@ -14,6 +14,8 @@ public class ClaudeService
     private readonly AnthropicClient _client;
     private const string Model = "claude-sonnet-4-6";
     private const int MaxRetries = 3;
+    private const int DefaultMaxTokens = 2048;
+    private const int DocumentMaxTokens = 4096;
 
     public ClaudeService(string apiKey)
     {
@@ -27,6 +29,7 @@ public class ClaudeService
     public async Task<string> CompleteAsync(
         string systemPrompt,
         string userContent,
+        int maxTokens = DefaultMaxTokens,
         CancellationToken ct = default)
     {
         var messages = new List<Message>
@@ -42,7 +45,7 @@ public class ClaudeService
         var request = new MessageParameters
         {
             Model = Model,
-            MaxTokens = 2048,
+            MaxTokens = maxTokens,
             System = system,
             Messages = messages
         };
@@ -58,6 +61,7 @@ public class ClaudeService
     public async Task<StepMessage?> CompleteAsStepMessageAsync(
         string systemPrompt,
         string userContent,
+        int maxTokens = DefaultMaxTokens,
         CancellationToken ct = default)
     {
         var currentPrompt = systemPrompt;
@@ -66,18 +70,28 @@ public class ClaudeService
         {
             try
             {
-                var raw = await CompleteAsync(currentPrompt, userContent, ct);
+                var raw = await CompleteAsync(currentPrompt, userContent, maxTokens, ct);
                 var json = StepJson.ExtractJson(raw);
                 var message = JsonSerializer.Deserialize<StepMessage>(json, StepJson.Options);
                 return message;
             }
-            catch (JsonException) when (attempt < MaxRetries)
+            catch (OperationCanceledException)
             {
-                // Tighten prompt on retry
+                // Propagate cancellation — don't swallow it
+                throw;
+            }
+            catch (Exception) when (attempt < MaxRetries)
+            {
+                // Tighten prompt on retry (catches JsonException, HttpRequestException, etc.)
                 currentPrompt = systemPrompt +
                     "\n\nCRITICAL: Your previous response was not valid JSON. " +
                     "You MUST respond with ONLY a valid JSON object. " +
                     "No markdown, no explanation, no ```json blocks. Just the raw JSON object.";
+            }
+            catch (Exception)
+            {
+                // Final attempt failed — return null so callers can use their fallback
+                return null;
             }
         }
 

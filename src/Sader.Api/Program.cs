@@ -63,8 +63,10 @@ builder.Services.AddSingleton(sp =>
         sp.GetRequiredService<LogisticsAgent>(),
         sp.GetRequiredService<ConsensusEngine>()));
 
-// SignalR broadcaster
+// SignalR broadcaster (Scoped — safe inside IServiceScope)
 builder.Services.AddScoped<StepBroadcaster>();
+// Singleton accessor for background tasks that need HubContext without scope
+builder.Services.AddSingleton<IHubContextAccessor, HubContextAccessor>();
 
 // ── Build & Migrate ──────────────────────────────────────────────────────────
 var app = builder.Build();

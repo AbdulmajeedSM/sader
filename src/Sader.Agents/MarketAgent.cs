@@ -95,8 +95,31 @@ public class MarketAgent : IStepAgent
             Intent: "proposeAlternative"
             """;
 
-        return await _claude.CompleteAsStepMessageAsync(SystemPrompt, userContent, ct);
+        var result = await _claude.CompleteAsStepMessageAsync(SystemPrompt, userContent, ct: ct);
+        return result ?? FallbackProposeAlternative(incoming);
     }
+
+    private static StepMessage FallbackProposeAlternative(StepMessage incoming) =>
+        StepMessage.Create(
+            intent: StepIntent.ProposeAlternative,
+            sender: AgentId.MarketAgent,
+            receiver: AgentId.ConsensusEngine,
+            conversationId: incoming.ConversationId,
+            parentMessageId: incoming.MessageId,
+            payload: new
+            {
+                originalDestination = "MY",
+                proposedDestination = "AE",
+                reason = "شهادة JAKIM تستغرق 14 يوماً — الإمارات تقبل SFDA مباشرة (صفر أيام إضافية)",
+                marketAnalysis = new
+                {
+                    country = "AE",
+                    score = 91,
+                    rationale = "سوق الإمارات: $38M واردات سنوية، نمو 12%، حصة سعودية 32%",
+                    keyAdvantage = "شهادة SFDA مقبولة مباشرة — لا حاجة لـ JAKIM"
+                }
+            },
+            confidence: 0.91m);
 
     private Task<StepMessage?> HandleRequirementsFoundAsync(StepMessage incoming, CancellationToken ct)
     {

@@ -18,7 +18,23 @@ public class StepHub : Hub
 }
 
 /// <summary>
+/// Singleton accessor so the background Task can reach IHubContext without scope issues.
+/// IHubContext<T> is itself singleton-safe in ASP.NET Core.
+/// </summary>
+public interface IHubContextAccessor
+{
+    IHubContext<StepHub> Hub { get; }
+}
+
+public class HubContextAccessor : IHubContextAccessor
+{
+    public HubContextAccessor(IHubContext<StepHub> hub) => Hub = hub;
+    public IHubContext<StepHub> Hub { get; }
+}
+
+/// <summary>
 /// Service for broadcasting STEP messages to SignalR clients.
+/// Registered as Scoped — safe to use inside a scope from background tasks.
 /// </summary>
 public class StepBroadcaster
 {

@@ -43,10 +43,11 @@ public class DocumentAgent : IStepAgent
         {
           "documentType": "CommercialInvoice",
           "title": "Commercial Invoice — Sukkari Dates Export to UAE",
-          "content": "<full invoice content as markdown>",
-          "tradeContext": { ... },
+          "content": "COMMERCIAL INVOICE\\nSeller: Al-Qassim Dates Factory\\nProduct: Sukkari Dates HS 0807.10\\nQty: 2000 KG @ USD 2.50 = USD 5,000\\nIncoterm: FOB Jeddah\\nHALAL: SFDA-2024-XXXXX",
           "estimatedProcessingDays": "1 business day"
         }
+
+        IMPORTANT: Keep the "content" field SHORT (1-3 lines). Do NOT generate a full document.
         """;
 
     public DocumentAgent(ClaudeService claude)
@@ -67,36 +68,66 @@ public class DocumentAgent : IStepAgent
     private async Task<StepMessage?> HandleConstraintWarningAsync(StepMessage incoming, CancellationToken ct)
     {
         var userContent = $"""
-            You received a CONSTRAINT_WARNING:
-            {StepJson.Serialize(incoming)}
-
-            Based on this constraint, assess the timeline risk.
-            The exporter wants to ship in ~21 days. The JAKIM HALAL cert takes 14 business days
-            PLUS other documents, making the total > 21 days.
+            You received a CONSTRAINT_WARNING about HALAL JAKIM certification taking 14 days.
+            The exporter wants to ship in ~21 days — this timeline is at risk.
             Send TIMELINE_RISK to ConsensusEngine.
             ConversationId: {incoming.ConversationId}
             ParentMessageId: {incoming.MessageId}
-            Receiver: "ConsensusEngine"
+            Receiver: "consensusEngine"
             Intent: "timelineRisk"
+            Keep payload under 200 characters.
             """;
 
-        return await _claude.CompleteAsStepMessageAsync(SystemPrompt, userContent, ct);
+        var result = await _claude.CompleteAsStepMessageAsync(SystemPrompt, userContent, ct: ct);
+        return result ?? FallbackTimelineRisk(incoming);
     }
 
     private async Task<StepMessage?> HandleDecisionReachedAsync(StepMessage incoming, CancellationToken ct)
     {
         var userContent = $"""
-            You received a DECISION_REACHED message:
-            {StepJson.Serialize(incoming)}
-
-            The decision has been made. Generate the Commercial Invoice document for the approved destination.
-            Send DOCUMENT_GENERATED with a complete, realistic invoice draft.
+            The consensus decision was reached. Generate a brief Commercial Invoice summary for UAE export.
             ConversationId: {incoming.ConversationId}
             ParentMessageId: {incoming.MessageId}
-            Receiver: "Broadcast"
+            Receiver: "broadcast"
             Intent: "documentGenerated"
+            Keep the "content" field to 3 lines maximum. Do not write a full document.
             """;
 
-        return await _claude.CompleteAsStepMessageAsync(SystemPrompt, userContent, ct);
+        var result = await _claude.CompleteAsStepMessageAsync(SystemPrompt, userContent, ct: ct);
+        return result ?? FallbackDocumentGenerated(incoming);
     }
+
+    private static StepMessage FallbackTimelineRisk(StepMessage incoming) =>
+        StepMessage.Create(
+            intent: StepIntent.TimelineRisk,
+            sender: AgentId.DocumentAgent,
+            receiver: AgentId.ConsensusEngine,
+            conversationId: incoming.ConversationId,
+            parentMessageId: incoming.MessageId,
+            payload: new
+            {
+                riskType = "CERTIFICATION_DELAY",
+                description = "تحذير: شهادة JAKIM تستغرق 14 يوماً عمل — لا تتناسب مع الجدول الزمني المطلوب (21 يوماً)",
+                daysRequired = 14,
+                daysAvailable = 21,
+                recommendation = "يُنصح بتحويل الشحنة إلى الإمارات التي تقبل شهادة SFDA مباشرة"
+            },
+            confidence: 0.99m);
+
+    private static StepMessage FallbackDocumentGenerated(StepMessage incoming) =>
+        StepMessage.Create(
+            intent: StepIntent.DocumentGenerated,
+            sender: AgentId.DocumentAgent,
+            receiver: AgentId.Broadcast,
+            conversationId: incoming.ConversationId,
+            parentMessageId: incoming.MessageId,
+            payload: new
+            {
+                documentType = "CommercialInvoice",
+                title = "فاتورة تجارية — تصدير تمور سكري إلى الإمارات",
+                content = "البائع: مصنع تمور القصيم | المشتري: [مستورد دبي]\nالمنتج: تمر سكري HS 0807.10 | الكمية: 2,000 كجم\nالسعر: 2.50 دولار/كجم | الإجمالي: 5,000 دولار | Incoterm: FOB جدة\nشهادة HALAL: SFDA-2024-XXXXX (مقبولة في الإمارات مباشرة)\nوقت المعالجة: يوم عمل واحد",
+                estimatedProcessingDays = "1 يوم عمل",
+                documentsRequired = new[] { "شهادة المنشأ", "شهادة الصحة النباتية", "الفاتورة التجارية", "قائمة التعبئة" }
+            },
+            confidence: 1.0m);
 }

@@ -15,7 +15,7 @@ const STATUS_LABELS: Record<AgentStatus, { ar: string; class: string }> = {
   done:     { ar: 'اكتمل',  class: 'text-emerald-400' },
 };
 
-const AGENTS: AgentId[] = ['MarketAgent', 'ComplianceAgent', 'DocumentAgent', 'LogisticsAgent', 'ConsensusEngine'];
+const AGENTS: AgentId[] = ['marketAgent', 'complianceAgent', 'documentAgent', 'logisticsAgent', 'consensusEngine'];
 
 export default function AgentStatusPanel({ statuses, decisionReached, winningOption, votes }: Props) {
   return (

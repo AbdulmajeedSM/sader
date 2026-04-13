@@ -11,27 +11,17 @@ export interface AgentConfig {
   dotColor: string;
 }
 
+const _e = (id: AgentId, nameAr: string, nameEn: string, icon: string, color: string, bg: string, border: string, dot: string): AgentConfig =>
+  ({ id, nameAr, nameEn, icon, color, bgColor: bg, borderColor: border, dotColor: dot });
+
+// Keys in camelCase to match JSON serialization from .NET (JsonNamingPolicy.CamelCase)
 export const AGENT_CONFIG: Record<string, AgentConfig> = {
-  MarketAgent: {
-    id: 'MarketAgent', nameAr: 'وكيل السوق', nameEn: 'Market', icon: '📊',
-    color: 'text-blue-400', bgColor: 'bg-blue-950/50', borderColor: 'border-blue-700', dotColor: 'bg-blue-400',
-  },
-  ComplianceAgent: {
-    id: 'ComplianceAgent', nameAr: 'وكيل الامتثال', nameEn: 'Compliance', icon: '🔍',
-    color: 'text-amber-400', bgColor: 'bg-amber-950/50', borderColor: 'border-amber-700', dotColor: 'bg-amber-400',
-  },
-  DocumentAgent: {
-    id: 'DocumentAgent', nameAr: 'وكيل المستندات', nameEn: 'Documents', icon: '📄',
-    color: 'text-violet-400', bgColor: 'bg-violet-950/50', borderColor: 'border-violet-700', dotColor: 'bg-violet-400',
-  },
-  LogisticsAgent: {
-    id: 'LogisticsAgent', nameAr: 'وكيل الشحن', nameEn: 'Logistics', icon: '🚢',
-    color: 'text-cyan-400', bgColor: 'bg-cyan-950/50', borderColor: 'border-cyan-700', dotColor: 'bg-cyan-400',
-  },
-  ConsensusEngine: {
-    id: 'ConsensusEngine', nameAr: 'محرك الإجماع', nameEn: 'Consensus', icon: '⚖️',
-    color: 'text-emerald-400', bgColor: 'bg-emerald-950/50', borderColor: 'border-emerald-700', dotColor: 'bg-emerald-400',
-  },
+  marketAgent:     _e('marketAgent',     'وكيل السوق',      'Market',     '📊', 'text-blue-400',    'bg-blue-950/50',    'border-blue-700',    'bg-blue-400'),
+  complianceAgent: _e('complianceAgent', 'وكيل الامتثال',   'Compliance', '🔍', 'text-amber-400',   'bg-amber-950/50',   'border-amber-700',   'bg-amber-400'),
+  documentAgent:   _e('documentAgent',   'وكيل المستندات',  'Documents',  '📄', 'text-violet-400',  'bg-violet-950/50',  'border-violet-700',  'bg-violet-400'),
+  logisticsAgent:  _e('logisticsAgent',  'وكيل الشحن',      'Logistics',  '🚢', 'text-cyan-400',    'bg-cyan-950/50',    'border-cyan-700',    'bg-cyan-400'),
+  consensusEngine: _e('consensusEngine', 'محرك الإجماع',    'Consensus',  '⚖️', 'text-emerald-400', 'bg-emerald-950/50', 'border-emerald-700', 'bg-emerald-400'),
+  broadcast:       _e('broadcast',       'الكل',            'Broadcast',  '📡', 'text-slate-400',   'bg-slate-900/50',   'border-slate-700',   'bg-slate-400'),
 };
 
 export const INTENT_LABELS: Record<StepIntent, { ar: string; badge: string; badgeClass: string }> = {

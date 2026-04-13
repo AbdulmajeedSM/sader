@@ -132,7 +132,7 @@ public class ConsensusEngine : IStepAgent
             ConversationId: {proposalMessage.ConversationId}
             """;
 
-        return await _claude.CompleteAsStepMessageAsync(VoteSystemPrompt, userContent, ct);
+        return await _claude.CompleteAsStepMessageAsync(VoteSystemPrompt, userContent, ct: ct);
     }
 
     private static string GetAgentVotingContext(AgentId agentId) => agentId switch

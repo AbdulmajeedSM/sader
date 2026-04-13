@@ -13,23 +13,22 @@ namespace Sader.Api.Controllers;
 public class ConversationsController : ControllerBase
 {
     private readonly StepOrchestrator _orchestrator;
-    private readonly StepBroadcaster _broadcaster;
+    private readonly IHubContextAccessor _hubAccessor;
     private readonly SaderDbContext _db;
+    private readonly IServiceScopeFactory _scopeFactory;
 
     public ConversationsController(
         StepOrchestrator orchestrator,
-        StepBroadcaster broadcaster,
-        SaderDbContext db)
+        IHubContextAccessor hubAccessor,
+        SaderDbContext db,
+        IServiceScopeFactory scopeFactory)
     {
         _orchestrator = orchestrator;
-        _broadcaster = broadcaster;
+        _hubAccessor = hubAccessor;
         _db = db;
+        _scopeFactory = scopeFactory;
     }
 
-    /// <summary>
-    /// POST /api/conversations — Starts a new export consultation demo.
-    /// Returns conversation ID immediately; messages are streamed via SignalR.
-    /// </summary>
     [HttpPost]
     public async Task<IActionResult> StartConversation(
         [FromBody] StartConversationRequest? request,
@@ -38,59 +37,54 @@ public class ConversationsController : ControllerBase
         var conversationId = Guid.NewGuid().ToString();
         var scenario = request?.Scenario ?? "dates-malaysia";
 
-        // Persist conversation
-        var conv = new ConversationEntity
+        _db.Conversations.Add(new ConversationEntity
         {
             Id = conversationId,
             Scenario = scenario,
             Status = "running"
-        };
-        _db.Conversations.Add(conv);
+        });
         await _db.SaveChangesAsync(ct);
 
-        // Fire-and-forget: run the scenario in background, streaming via SignalR
+        // Background task: uses its own scope so DbContext is never disposed under us
         _ = Task.Run(async () =>
         {
+            using var scope = _scopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<SaderDbContext>();
+            var broadcaster = scope.ServiceProvider.GetRequiredService<StepBroadcaster>();
             int orderIndex = 0;
+
             try
             {
                 await _orchestrator.RunDatesExportScenarioAsync(
                     conversationId,
                     async message =>
                     {
-                        // Persist message
-                        _db.Messages.Add(new MessageEntity
+                        db.Messages.Add(new MessageEntity
                         {
                             ConversationId = conversationId,
                             MessageJson = StepJson.Serialize(message),
                             Timestamp = message.Timestamp.ToString("o"),
                             OrderIndex = orderIndex++
                         });
-                        await _db.SaveChangesAsync();
-
-                        // Broadcast to SignalR clients
-                        await _broadcaster.BroadcastMessageAsync(message);
+                        await db.SaveChangesAsync();
+                        await broadcaster.BroadcastMessageAsync(message);
                     });
 
-                // Mark complete
-                conv.Status = "completed";
-                await _db.SaveChangesAsync();
-                await _broadcaster.BroadcastStatusAsync(conversationId, "completed");
+                var conv = await db.Conversations.FindAsync(conversationId);
+                if (conv is not null) { conv.Status = "completed"; await db.SaveChangesAsync(); }
+                await broadcaster.BroadcastStatusAsync(conversationId, "completed");
             }
             catch (Exception ex)
             {
-                conv.Status = "failed";
-                await _db.SaveChangesAsync();
-                await _broadcaster.BroadcastStatusAsync(conversationId, "failed", ex.Message);
+                var conv = await db.Conversations.FindAsync(conversationId);
+                if (conv is not null) { conv.Status = "failed"; await db.SaveChangesAsync(); }
+                await broadcaster.BroadcastStatusAsync(conversationId, "failed", ex.Message);
             }
         }, CancellationToken.None);
 
         return Ok(new { conversationId, status = "started" });
     }
 
-    /// <summary>
-    /// GET /api/conversations/{id} — Returns all messages for a conversation (for replay).
-    /// </summary>
     [HttpGet("{id}")]
     public async Task<IActionResult> GetConversation(string id, CancellationToken ct)
     {
@@ -98,40 +92,22 @@ public class ConversationsController : ControllerBase
             .Include(c => c.Messages.OrderBy(m => m.OrderIndex))
             .FirstOrDefaultAsync(c => c.Id == id, ct);
 
-        if (conv is null)
-            return NotFound();
+        if (conv is null) return NotFound();
 
         var messages = conv.Messages
             .Select(m => JsonSerializer.Deserialize<JsonElement>(m.MessageJson))
             .ToList();
 
-        return Ok(new
-        {
-            conversationId = conv.Id,
-            scenario = conv.Scenario,
-            status = conv.Status,
-            messages
-        });
+        return Ok(new { conversationId = conv.Id, scenario = conv.Scenario, status = conv.Status, messages });
     }
 
-    /// <summary>
-    /// GET /api/conversations — Lists recent conversations.
-    /// </summary>
     [HttpGet]
     public async Task<IActionResult> ListConversations(CancellationToken ct)
     {
         var convs = await _db.Conversations
             .Take(20)
-            .Select(c => new
-            {
-                c.Id,
-                c.Scenario,
-                c.Status,
-                CreatedAt = c.CreatedAt.ToString(),
-                MessageCount = c.Messages.Count
-            })
+            .Select(c => new { c.Id, c.Scenario, c.Status, c.CreatedAt, MessageCount = c.Messages.Count })
             .ToListAsync(ct);
-
         return Ok(convs);
     }
 }

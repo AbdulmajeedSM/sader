@@ -1,11 +1,12 @@
+// camelCase to match .NET JsonNamingPolicy.CamelCase serialization
 export type AgentId =
-  | 'MarketAgent'
-  | 'ComplianceAgent'
-  | 'DocumentAgent'
-  | 'LogisticsAgent'
-  | 'ConsensusEngine'
-  | 'Broadcast'
-  | 'User';
+  | 'marketAgent'
+  | 'complianceAgent'
+  | 'documentAgent'
+  | 'logisticsAgent'
+  | 'consensusEngine'
+  | 'broadcast'
+  | 'user';
 
 export type StepIntent =
   | 'queryRequirements'

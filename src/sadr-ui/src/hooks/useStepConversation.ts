@@ -3,7 +3,7 @@ import * as signalR from '@microsoft/signalr';
 import type { StepMessage, AgentId, AgentStatus, ConversationState } from '../types/step';
 
 const ALL_AGENTS: AgentId[] = [
-  'MarketAgent', 'ComplianceAgent', 'DocumentAgent', 'LogisticsAgent', 'ConsensusEngine'
+  'marketAgent', 'complianceAgent', 'documentAgent', 'logisticsAgent', 'consensusEngine'
 ];
 
 const initialStatuses = (): Record<AgentId, AgentStatus> =>
@@ -57,7 +57,7 @@ export function useStepConversation() {
         const newStatuses = { ...prev.agentStatuses };
 
         // Sender becomes thinking/voting
-        if (msg.sender !== 'Broadcast' && msg.sender !== 'User') {
+        if (msg.sender !== 'broadcast' && msg.sender !== 'user') {
           newStatuses[msg.sender] = deriveStatus(msg.intent);
         }
 

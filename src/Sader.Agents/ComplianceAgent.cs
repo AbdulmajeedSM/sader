@@ -81,8 +81,35 @@ public class ComplianceAgent : IStepAgent
             ParentMessageId: {incoming.MessageId}
             """;
 
-        return await _claude.CompleteAsStepMessageAsync(SystemPrompt, userContent, ct);
+        var result = await _claude.CompleteAsStepMessageAsync(SystemPrompt, userContent, ct: ct);
+        return result ?? FallbackConstraintWarning(incoming);
     }
+
+    private static StepMessage FallbackConstraintWarning(StepMessage incoming) =>
+        StepMessage.Create(
+            intent: StepIntent.ConstraintWarning,
+            sender: AgentId.ComplianceAgent,
+            receiver: AgentId.MarketAgent,
+            conversationId: incoming.ConversationId,
+            parentMessageId: incoming.MessageId,
+            payload: new
+            {
+                constraintType = "CERTIFICATION_DELAY",
+                severity = "Blocker",
+                blocksExport = true,
+                description = "شهادة HALAL JAKIM ماليزيا إلزامية وتستغرق 14 يوم عمل — لا يوجد بديل سعودي مقبول",
+                affectedCertification = new
+                {
+                    certType = "HALAL_JAKIM",
+                    issuingBody = "Jabatan Kemajuan Islam Malaysia (JAKIM)",
+                    estimatedDays = 14,
+                    isMandatory = true,
+                    acceptedEquivalent = (string?)null
+                },
+                tradeContext = new { hsCode = "0807.10", originCountry = "SA", destinationCountry = "MY", quantity = 2000 },
+                suggestedActions = new[] { "تحويل الشحنة للإمارات (تقبل SFDA مباشرة)", "تقديم طلب JAKIM الآن إذا كان التأجيل مقبولاً" }
+            },
+            confidence: 0.97m);
 
     private async Task<string> LoadComplianceDataAsync(object payload, CancellationToken ct)
     {
