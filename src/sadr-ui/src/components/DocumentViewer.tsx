@@ -12,48 +12,68 @@ export default function DocumentViewer({ messages }: Props) {
   if (docMessages.length === 0) return null;
 
   const selected = docMessages[selectedIdx];
-  const payload = selected.payload as Record<string, unknown>;
-  const content = payload.content as string | undefined;
-  const title = payload.title as string | undefined;
-  const docType = payload.documentType as string | undefined;
-  const processingDays = payload.estimatedProcessingDays as string | undefined;
-  const docsRequired = payload.documentsRequired as string[] | undefined;
+  const p = selected.payload as Record<string, unknown>;
+  const content = p.content as string | undefined;
+  const title = p.title as string | undefined;
+  const docType = p.documentType as string | undefined;
+  const processingDays = p.estimatedProcessingDays as string | undefined;
+  const docsRequired = p.documentsRequired as string[] | undefined;
 
   return (
-    <div className="rounded-xl border border-violet-600/60 bg-violet-950/30 overflow-hidden shadow-lg shadow-violet-950/40">
+    <div style={{
+      borderRadius: 12,
+      border: '1px solid rgba(167,139,250,0.3)',
+      background: 'var(--surface-1)',
+      overflow: 'hidden',
+      boxShadow: '0 0 32px rgba(167,139,250,0.08)',
+    }}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-violet-800/50 bg-violet-950/50">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-violet-800/60 flex items-center justify-center text-lg">📄</div>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '12px 16px',
+        borderBottom: '1px solid rgba(167,139,250,0.2)',
+        background: 'rgba(167,139,250,0.06)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: 8,
+            background: 'rgba(167,139,250,0.15)', border: '1px solid rgba(167,139,250,0.3)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17,
+          }}>📄</div>
           <div>
-            <div className="text-sm font-bold text-violet-100">{title ?? 'وثيقة مُولَّدة'}</div>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-xs text-violet-400 font-mono">{docType}</span>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#C4B5FD' }}>{title ?? 'وثيقة مُولَّدة'}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
+              <span style={{ fontSize: 10, fontFamily: 'var(--mono)', color: 'var(--text-3)' }}>{docType}</span>
               {processingDays && (
                 <>
-                  <span className="text-violet-700">·</span>
-                  <span className="text-xs text-emerald-400">⏱ {processingDays}</span>
+                  <span style={{ color: 'var(--border-hi)' }}>·</span>
+                  <span style={{ fontSize: 10, color: 'var(--green)', fontFamily: 'var(--mono)' }}>⏱ {processingDays}</span>
                 </>
               )}
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-xs px-2 py-1 rounded-full bg-emerald-900/60 text-emerald-300 border border-emerald-700/50">
-            ✓ جاهزة
-          </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{
+            fontSize: 10, padding: '3px 10px', borderRadius: 100,
+            background: 'rgba(0,201,122,0.12)', border: '1px solid rgba(0,201,122,0.3)',
+            color: 'var(--green)', fontFamily: 'var(--mono)',
+          }}>✓ جاهزة</span>
+
           {docMessages.length > 1 && (
-            <div className="flex gap-1">
+            <div style={{ display: 'flex', gap: 4 }}>
               {docMessages.map((_, i) => (
                 <button
+                  type="button"
                   key={i}
                   onClick={() => setSelectedIdx(i)}
-                  className={`w-6 h-6 rounded text-xs transition-colors ${
-                    i === selectedIdx
-                      ? 'bg-violet-600 text-white'
-                      : 'bg-violet-900/60 text-violet-400 hover:bg-violet-800'
-                  }`}
+                  style={{
+                    width: 24, height: 24, borderRadius: 4, border: 'none',
+                    background: i === selectedIdx ? 'rgba(167,139,250,0.4)' : 'var(--surface-3)',
+                    color: i === selectedIdx ? '#fff' : 'var(--text-3)',
+                    fontSize: 11, cursor: 'pointer', fontFamily: 'var(--mono)',
+                  }}
                 >{i + 1}</button>
               ))}
             </div>
@@ -62,19 +82,32 @@ export default function DocumentViewer({ messages }: Props) {
       </div>
 
       {/* Document content */}
-      <div className="p-4">
-        <pre className="text-xs text-violet-100 whitespace-pre-wrap font-mono leading-relaxed bg-slate-950/60 rounded-lg p-3 border border-slate-800 max-h-48 overflow-y-auto" dir="rtl">
+      <div style={{ padding: '16px' }}>
+        <pre style={{
+          margin: 0, fontSize: 12, padding: '14px 16px',
+          background: 'var(--bg)', borderRadius: 8,
+          border: '1px solid var(--border)',
+          color: '#DDD6FE', maxHeight: 200, overflowY: 'auto',
+          fontFamily: 'var(--mono)', lineHeight: 1.7,
+          whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+        }} dir="rtl">
           {content ?? 'جارٍ توليد الوثيقة...'}
         </pre>
       </div>
 
-      {/* Documents required list */}
+      {/* Required documents */}
       {docsRequired && docsRequired.length > 0 && (
-        <div className="px-4 pb-4">
-          <div className="text-xs text-violet-400 mb-2 font-medium">المستندات المطلوبة:</div>
-          <div className="flex flex-wrap gap-2">
+        <div style={{ padding: '0 16px 16px' }}>
+          <div style={{ fontSize: 10, color: 'var(--text-3)', fontFamily: 'var(--mono)', marginBottom: 8, letterSpacing: '0.06em' }}>
+            REQUIRED DOCUMENTS
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {docsRequired.map((doc, i) => (
-              <span key={i} className="text-xs px-2 py-1 bg-slate-900 rounded-lg border border-slate-700 text-slate-300">
+              <span key={i} style={{
+                fontSize: 11, padding: '4px 10px', borderRadius: 4,
+                background: 'var(--surface-2)', border: '1px solid var(--border)',
+                color: 'var(--text-2)',
+              }}>
                 📎 {doc}
               </span>
             ))}
@@ -83,9 +116,17 @@ export default function DocumentViewer({ messages }: Props) {
       )}
 
       {/* Footer */}
-      <div className="px-4 py-2 bg-violet-950/40 border-t border-violet-900/50 flex items-center justify-between">
-        <span className="text-xs text-violet-500 font-mono">STEP Protocol · documentGenerated</span>
-        <span className="text-xs text-slate-600 font-mono">{selected.messageId.slice(0, 8)}</span>
+      <div style={{
+        padding: '8px 16px',
+        borderTop: '1px solid var(--border)',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+      }}>
+        <span style={{ fontSize: 10, color: 'var(--text-3)', fontFamily: 'var(--mono)' }}>
+          STEP · documentGenerated
+        </span>
+        <span style={{ fontSize: 10, color: 'var(--text-3)', fontFamily: 'var(--mono)' }}>
+          {selected.messageId.slice(0, 8)}
+        </span>
       </div>
     </div>
   );

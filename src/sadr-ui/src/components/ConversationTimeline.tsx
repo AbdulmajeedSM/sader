@@ -9,13 +9,17 @@ interface Props {
 
 function TypingIndicator() {
   return (
-    <div className="flex items-center gap-1.5 px-4 py-3 bg-slate-900/40 rounded-xl border border-slate-800 w-fit">
-      <span className="text-slate-500 text-xs">الوكلاء يعملون</span>
-      <div className="flex gap-1">
-        <div className="typing-dot w-1.5 h-1.5 bg-slate-500 rounded-full" />
-        <div className="typing-dot w-1.5 h-1.5 bg-slate-500 rounded-full" />
-        <div className="typing-dot w-1.5 h-1.5 bg-slate-500 rounded-full" />
+    <div style={{
+      display: 'inline-flex', alignItems: 'center', gap: 10,
+      padding: '10px 16px', borderRadius: 8,
+      border: '1px solid var(--border)', background: 'var(--surface-2)',
+    }}>
+      <div style={{ display: 'flex', gap: 4 }}>
+        <div className="typing-dot" style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--gold)' }} />
+        <div className="typing-dot" style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--gold)' }} />
+        <div className="typing-dot" style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--gold)' }} />
       </div>
+      <span style={{ color: 'var(--text-3)', fontSize: 12, fontFamily: 'var(--mono)' }}>الوكلاء يعملون...</span>
     </div>
   );
 }
@@ -28,31 +32,46 @@ export default function ConversationTimeline({ messages, status }: Props) {
   }, [messages.length]);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {/* Protocol header */}
-      <div className="flex items-center gap-2 mb-1">
-        <div className="h-px flex-1 bg-slate-800" />
-        <span className="text-xs text-slate-600 font-mono px-2">STEP Protocol v0.1</span>
-        <div className="h-px flex-1 bg-slate-800" />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+        <div style={{ height: 1, flex: 1, background: 'linear-gradient(90deg, transparent, var(--border))' }} />
+        <span style={{ color: 'var(--text-3)', fontSize: 10, fontFamily: 'var(--mono)', letterSpacing: '0.08em', padding: '3px 10px', border: '1px solid var(--border)', borderRadius: 4 }}>
+          STEP PROTOCOL · LIVE FEED
+        </span>
+        <div style={{ height: 1, flex: 1, background: 'linear-gradient(90deg, var(--border), transparent)' }} />
       </div>
 
+      {/* Empty + running */}
       {messages.length === 0 && status === 'running' && <TypingIndicator />}
 
+      {/* Messages */}
       {messages.map((msg, i) => (
         <MessageBubble key={msg.messageId} message={msg} index={i} />
       ))}
 
-      {status === 'running' && messages.length > 0 && <TypingIndicator />}
-
-      {status === 'completed' && (
-        <div className="text-center py-3">
-          <div className="text-xs text-slate-600 font-mono">─── نهاية المحادثة ───</div>
+      {/* Running indicator */}
+      {status === 'running' && messages.length > 0 && (
+        <div style={{ paddingRight: 4 }}>
+          <TypingIndicator />
         </div>
       )}
 
+      {/* Completed */}
+      {status === 'completed' && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0' }}>
+          <div style={{ height: 1, flex: 1, background: 'linear-gradient(90deg, transparent, rgba(0,201,122,0.3))' }} />
+          <span style={{ color: 'var(--green)', fontSize: 10, fontFamily: 'var(--mono)', letterSpacing: '0.06em' }}>
+            ✓ SESSION COMPLETE
+          </span>
+          <div style={{ height: 1, flex: 1, background: 'linear-gradient(90deg, rgba(0,201,122,0.3), transparent)' }} />
+        </div>
+      )}
+
+      {/* Failed */}
       {status === 'failed' && (
-        <div className="text-center py-3">
-          <div className="text-xs text-red-600">حدث خطأ في المحادثة</div>
+        <div style={{ textAlign: 'center', padding: '12px 0', color: 'var(--red)', fontSize: 12, fontFamily: 'var(--mono)' }}>
+          ✗ SESSION FAILED
         </div>
       )}
 
