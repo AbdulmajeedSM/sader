@@ -100,7 +100,7 @@ export default function MessageBubble({ message, index }: Props) {
           <span className={`text-sm font-medium ${cfg.color}`}>{cfg.nameAr}</span>
           <span className="text-slate-600 text-xs">←</span>
           <span className="text-slate-400 text-xs">
-            {AGENT_CONFIG[message.receiver]?.nameAr ?? (message.receiver === 'broadcast' || message.receiver === 'Broadcast' ? 'الكل' : message.receiver)}
+            {AGENT_CONFIG[message.receiver]?.nameAr ?? (message.receiver === 'broadcast' ? 'الكل' : message.receiver)}
           </span>
         </div>
         <span className={`text-xs font-mono px-2 py-0.5 rounded ${intentMeta.badgeClass}`}>

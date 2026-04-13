@@ -71,7 +71,7 @@ export function useStepConversation() {
       });
 
       // Reset sender to idle after 2s (unless consensus phase)
-      if (msg.intent !== 'decisionReached' && msg.sender !== 'Broadcast') {
+      if (msg.intent !== 'decisionReached' && msg.sender !== 'broadcast') {
         setTimeout(() => {
           setState(prev => {
             if (!prev) return prev;
