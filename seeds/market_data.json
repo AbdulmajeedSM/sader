@@ -1,0 +1,76 @@
+{
+  "markets": [
+    {
+      "country": "MY",
+      "countryName": "Malaysia",
+      "hsCode": "0807.10",
+      "importVolumeUsd": 45000000,
+      "growthRate": 0.08,
+      "marketScore": 72,
+      "saudiMarketShare": 0.15,
+      "keyBuyers": ["Lulu Hypermarket Malaysia", "Cold Storage", "Mydin"],
+      "peakSeason": "Ramadan (March-April)",
+      "notes": "Strong Muslim-majority market. High HALAL awareness. Saudi dates premium brand.",
+      "risks": ["JAKIM HALAL certification delay", "Competitive pricing from Iran/Iraq dates"],
+      "freightFromJeddah": {
+        "sea": { "transitDays": 20, "costPerCbm": 180, "port": "Port Klang" },
+        "air": { "transitDays": 2, "costPerKg": 8.5, "airport": "KLIA" }
+      }
+    },
+    {
+      "country": "AE",
+      "countryName": "United Arab Emirates",
+      "hsCode": "0807.10",
+      "importVolumeUsd": 38000000,
+      "growthRate": 0.12,
+      "marketScore": 91,
+      "saudiMarketShare": 0.32,
+      "keyBuyers": ["Carrefour UAE", "Lulu Hypermarket UAE", "Union Coop", "Spinneys"],
+      "peakSeason": "Ramadan + National Day (December)",
+      "notes": "Premium market. Saudi diaspora and re-export hub. Strong demand for Sukkari dates specifically. SFDA HALAL accepted directly.",
+      "risks": ["High competition from local Emirati dates", "Seasonal price fluctuation"],
+      "freightFromJeddah": {
+        "sea": { "transitDays": 3, "costPerCbm": 45, "port": "Jebel Ali" },
+        "road": { "transitDays": 2, "costPerTon": 850, "route": "Jeddah → Riyadh → Abu Dhabi" }
+      }
+    },
+    {
+      "country": "BH",
+      "countryName": "Bahrain",
+      "hsCode": "0807.10",
+      "importVolumeUsd": 8500000,
+      "growthRate": 0.05,
+      "marketScore": 78,
+      "saudiMarketShare": 0.41,
+      "keyBuyers": ["Lulu Hypermarket Bahrain", "Sultan Center"],
+      "peakSeason": "Ramadan",
+      "notes": "GCC member. Small but accessible market. Road transport available via King Fahd Causeway.",
+      "risks": ["Small market size limits volume", "Price sensitivity"],
+      "freightFromJeddah": {
+        "road": { "transitDays": 1, "costPerTon": 650, "route": "Qassim → Dammam → King Fahd Causeway" }
+      }
+    },
+    {
+      "country": "JO",
+      "countryName": "Jordan",
+      "hsCode": "0807.10",
+      "importVolumeUsd": 12000000,
+      "growthRate": 0.04,
+      "marketScore": 65,
+      "saudiMarketShare": 0.22,
+      "keyBuyers": ["Cozmo Hypermarket", "Safeway Jordan"],
+      "peakSeason": "Ramadan",
+      "notes": "Arab League country. Saudi SFDA accepted. Road transport available.",
+      "risks": ["Regional political instability", "Currency exchange risk"],
+      "freightFromJeddah": {
+        "road": { "transitDays": 2, "costPerTon": 1100, "route": "Jeddah → Tabuk → Aqaba → Amman" }
+      }
+    }
+  ],
+  "logisticsConstants": {
+    "qassimToJeddahPortDays": 2,
+    "standardPackagingCbmPerTon": 2.0,
+    "insurancePercent": 0.005,
+    "handlingFeeUsd": 120
+  }
+}

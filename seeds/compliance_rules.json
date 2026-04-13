@@ -1,0 +1,106 @@
+{
+  "rules": [
+    {
+      "hsCode": "0807.10",
+      "destinationCountry": "MY",
+      "productCategory": "Dates (fresh or dried)",
+      "certifications": [
+        {
+          "certType": "HALAL_JAKIM",
+          "issuingBody": "Jabatan Kemajuan Islam Malaysia (JAKIM)",
+          "estimatedDays": 14,
+          "isMandatory": true,
+          "acceptedEquivalent": null,
+          "notes": "JAKIM requires physical audit of production facility. No Saudi equivalent accepted.",
+          "cost": "approx SAR 3,500"
+        },
+        {
+          "certType": "PHYTOSANITARY",
+          "issuingBody": "Ministry of Environment, Water and Agriculture (MEWA) - Saudi Arabia",
+          "estimatedDays": 3,
+          "isMandatory": true,
+          "acceptedEquivalent": null,
+          "notes": "Required for all fresh/dried fruit exports. Issued at port of origin.",
+          "cost": "approx SAR 250"
+        },
+        {
+          "certType": "COO",
+          "issuingBody": "Saudi Customs / Saudi Exporters Club",
+          "estimatedDays": 2,
+          "isMandatory": true,
+          "acceptedEquivalent": null,
+          "notes": "Certificate of Origin - required for preferential tariff under ASEAN-GCC agreement.",
+          "cost": "approx SAR 150"
+        }
+      ],
+      "importTariffPercent": 0,
+      "notes": "Malaysia has FTA with GCC, zero tariff on dates under HS 0807.10.",
+      "blockers": ["HALAL_JAKIM delay (14 days minimum)"]
+    },
+    {
+      "hsCode": "0807.10",
+      "destinationCountry": "AE",
+      "productCategory": "Dates (fresh or dried)",
+      "certifications": [
+        {
+          "certType": "HALAL_SFDA",
+          "issuingBody": "Saudi Food and Drug Authority (SFDA)",
+          "estimatedDays": 0,
+          "isMandatory": true,
+          "acceptedEquivalent": "HALAL_SFDA",
+          "notes": "UAE accepts Saudi SFDA HALAL certification directly. No additional application needed if exporter already holds SFDA cert.",
+          "cost": "SAR 0 (if already certified)"
+        },
+        {
+          "certType": "PHYTOSANITARY",
+          "issuingBody": "Ministry of Environment, Water and Agriculture (MEWA) - Saudi Arabia",
+          "estimatedDays": 3,
+          "isMandatory": true,
+          "acceptedEquivalent": null,
+          "notes": "Standard phytosanitary certificate from MEWA.",
+          "cost": "approx SAR 250"
+        },
+        {
+          "certType": "COO",
+          "issuingBody": "Saudi Customs",
+          "estimatedDays": 2,
+          "isMandatory": true,
+          "acceptedEquivalent": null,
+          "notes": "Certificate of Origin required. UAE-Saudi bilateral preferential treatment applies.",
+          "cost": "approx SAR 150"
+        }
+      ],
+      "importTariffPercent": 0,
+      "notes": "UAE-Saudi bilateral trade: zero tariff, SFDA HALAL accepted. Fastest route for Saudi exporters.",
+      "blockers": []
+    },
+    {
+      "hsCode": "0807.10",
+      "destinationCountry": "BH",
+      "productCategory": "Dates (fresh or dried)",
+      "certifications": [
+        {
+          "certType": "HALAL_SFDA",
+          "issuingBody": "Saudi Food and Drug Authority (SFDA)",
+          "estimatedDays": 0,
+          "isMandatory": true,
+          "acceptedEquivalent": "HALAL_SFDA",
+          "notes": "Bahrain is GCC member - SFDA HALAL accepted directly.",
+          "cost": "SAR 0 (if already certified)"
+        },
+        {
+          "certType": "COO",
+          "issuingBody": "Saudi Customs",
+          "estimatedDays": 2,
+          "isMandatory": false,
+          "acceptedEquivalent": null,
+          "notes": "GCC free movement - COO optional but recommended.",
+          "cost": "approx SAR 150"
+        }
+      ],
+      "importTariffPercent": 0,
+      "notes": "GCC member - simplest route, road transport available.",
+      "blockers": []
+    }
+  ]
+}
