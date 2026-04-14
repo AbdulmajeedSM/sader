@@ -3,28 +3,26 @@
 
 /* ── Design Tokens ──────────────────────────────────────────────────────────── */
 :root {
-  --bg:           #020408;
-  --surface-1:    #07090f;
-  --surface-2:    #0d1220;
-  --surface-3:    #131c2e;
-  --border:       #1a2540;
-  --border-hi:    #253660;
+  --bg:           #02040a;
+  --surface-1:    #060810;
+  --surface-2:    #0b1018;
+  --surface-3:    #111828;
+  --border:       #182035;
+  --border-hi:    #223050;
 
   --gold:         #C9922E;
   --gold-hi:      #E8B865;
-  --gold-dim:     #6B4E18;
-  --gold-glow:    rgba(201, 146, 46, 0.18);
+  --gold-dim:     #5A3E12;
+  --gold-glow:    rgba(201, 146, 46, 0.20);
 
-  --cyan:         #00BFD8;
-  --cyan-dim:     rgba(0, 191, 216, 0.12);
+  --cyan:         #00C4DA;
   --green:        #00C97A;
-  --green-dim:    rgba(0, 201, 122, 0.12);
   --red:          #E84040;
-  --orange:       #E87820;
+  --violet:       #A78BFA;
 
-  --text-1:       #D8E4F8;
-  --text-2:       #7A90B8;
-  --text-3:       #3A506A;
+  --text-1:       #D8E6FF;
+  --text-2:       #6A85B0;
+  --text-3:       #334560;
 
   --mono:         'IBM Plex Mono', monospace;
   --sans:         'Cairo', system-ui, sans-serif;
@@ -46,7 +44,19 @@ body {
 
 #root { min-height: 100vh; }
 
-/* ── Geometric Background ───────────────────────────────────────────────────── */
+/* ── Noise Film Grain ───────────────────────────────────────────────────────── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.028;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+/* ── Grid Background ────────────────────────────────────────────────────────── */
 .geo-bg {
   position: fixed;
   inset: 0;
@@ -57,111 +67,111 @@ body {
 .geo-bg::before {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: -10%;
   background-image:
     linear-gradient(var(--border) 1px, transparent 1px),
     linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: 48px 48px;
-  opacity: 0.35;
+  background-size: 52px 52px;
+  opacity: 0.28;
 }
 .geo-bg::after {
   content: '';
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,146,46,0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 60% at 100% 80%, rgba(0,191,216,0.04) 0%, transparent 60%);
+    radial-gradient(ellipse 70% 55% at 50% -5%, rgba(201,146,46,0.10) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 5%  80%, rgba(0,196,218,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 95% 90%, rgba(167,139,250,0.04) 0%, transparent 60%);
 }
 
 /* ── Scrollbar ──────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar       { width: 4px; }
-::-webkit-scrollbar-track { background: var(--surface-1); }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
 
-/* ── Typography ─────────────────────────────────────────────────────────────── */
-.mono { font-family: var(--mono); }
-
-/* ── Animations ─────────────────────────────────────────────────────────────── */
+/* ── Keyframes ──────────────────────────────────────────────────────────────── */
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-@keyframes ping {
-  75%, 100% { transform: scale(2); opacity: 0; }
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
+@keyframes heroReveal {
+  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
 }
 @keyframes blink {
   0%, 80%, 100% { opacity: 0; }
   40%           { opacity: 1; }
+}
+@keyframes ping {
+  75%, 100% { transform: scale(2.2); opacity: 0; }
+}
+@keyframes nodePulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.55; }
 }
 @keyframes fillBar {
   from { width: 0; }
   to   { width: var(--fill-w); }
 }
 @keyframes goldPulse {
-  0%   { box-shadow: 0 0 0 0 rgba(201,146,46,0.5); }
-  70%  { box-shadow: 0 0 0 16px rgba(201,146,46,0); }
-  100% { box-shadow: 0 0 0 0 rgba(201,146,46,0); }
+  0%   { box-shadow: 0 0 0 0   rgba(201,146,46,0.55); }
+  70%  { box-shadow: 0 0 0 18px rgba(201,146,46,0); }
+  100% { box-shadow: 0 0 0 0   rgba(201,146,46,0); }
 }
-@keyframes scanline {
-  0%   { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
+@keyframes flowEdge {
+  to { stroke-dashoffset: -28; }
 }
-@keyframes heroReveal {
-  from { opacity: 0; transform: translateY(24px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+@keyframes orb {
+  0%   { transform: translate(0px,   0px); }
+  33%  { transform: translate(20px, -30px); }
+  66%  { transform: translate(-15px, 20px); }
+  100% { transform: translate(0px,   0px); }
 }
 
+/* ── Utility classes ────────────────────────────────────────────────────────── */
 .message-enter {
-  animation: slideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: slideUp 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   opacity: 0;
 }
 .consensus-badge { animation: goldPulse 1.8s ease-out 3; }
 
-.typing-dot:nth-child(1) { animation: blink 1.4s infinite 0s; }
+.typing-dot:nth-child(1) { animation: blink 1.4s infinite 0.0s; }
 .typing-dot:nth-child(2) { animation: blink 1.4s infinite 0.2s; }
 .typing-dot:nth-child(3) { animation: blink 1.4s infinite 0.4s; }
 
 .vote-bar-fill {
-  animation: fillBar 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: fillBar 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   width: var(--fill-w);
 }
 
-/* ── Agent accent map ───────────────────────────────────────────────────────── */
-.agent-bar-marketAgent     { background: #3B82F6; }
-.agent-bar-complianceAgent { background: var(--gold); }
-.agent-bar-documentAgent   { background: #A78BFA; }
-.agent-bar-logisticsAgent  { background: var(--cyan); }
-.agent-bar-consensusEngine { background: var(--green); }
-
-/* ── Glass surface ──────────────────────────────────────────────────────────── */
-.glass {
-  background: rgba(7, 9, 15, 0.7);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-}
-
-/* ── Hero gradient text ─────────────────────────────────────────────────────── */
+/* ── Text gradients ─────────────────────────────────────────────────────────── */
 .gold-text {
-  background: linear-gradient(135deg, var(--gold-hi) 0%, var(--gold) 50%, #A06820 100%);
+  background: linear-gradient(135deg, var(--gold-hi) 0%, var(--gold) 60%, #A06010 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.blue-text {
+  background: linear-gradient(135deg, #93C5FD 0%, #60A5FA 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* ── Ping dot helper ────────────────────────────────────────────────────────── */
-.ping-dot::before {
+/* ── Timeline vertical line ─────────────────────────────────────────────────── */
+.timeline-wrap {
+  position: relative;
+}
+.timeline-wrap::before {
   content: '';
   position: absolute;
-  inset: 0;
-  border-radius: 9999px;
-  animation: ping 1.2s cubic-bezier(0,0,0.2,1) infinite;
-  background: inherit;
+  top: 0;
+  bottom: 0;
+  right: -20px;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent 0%, var(--border-hi) 8%, var(--border-hi) 92%, transparent 100%);
 }
