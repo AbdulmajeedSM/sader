@@ -1,0 +1,24 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/dist/
+**/node_modules/
+
+# Git
+.git/
+.gitignore
+
+# Dev config (key must come from env var in prod)
+**/appsettings.Development.json
+
+# SQLite databases
+**/*.db
+**/*.db-shm
+**/*.db-wal
+
+# IDE / OS
+.vs/
+.vscode/
+.idea/
+**/.DS_Store
+**/Thumbs.db

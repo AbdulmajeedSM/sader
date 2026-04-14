@@ -5,18 +5,24 @@ using Sader.Api.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ── Configuration ────────────────────────────────────────────────────────────
+// ── Port (Railway injects $PORT) ──────────────────────────────────────────────
+var port = Environment.GetEnvironmentVariable("PORT");
+if (port is not null)
+    builder.WebHost.UseUrls($"http://+:{port}");
+
+// ── Configuration ─────────────────────────────────────────────────────────────
 var claudeApiKey = builder.Configuration["CLAUDE_API_KEY"]
     ?? Environment.GetEnvironmentVariable("CLAUDE_API_KEY")
-    ?? throw new InvalidOperationException("CLAUDE_API_KEY is required. Set it in appsettings.json or environment variables.");
+    ?? throw new InvalidOperationException(
+        "CLAUDE_API_KEY is required. Set it in appsettings.json or as an environment variable.");
 
 var seedsPath = builder.Configuration["SeedsPath"]
+    ?? Environment.GetEnvironmentVariable("SeedsPath")
     ?? Path.Combine(builder.Environment.ContentRootPath, "..", "..", "seeds");
 
-// Resolve absolute path
 seedsPath = Path.GetFullPath(seedsPath);
 
-// ── Services ─────────────────────────────────────────────────────────────────
+// ── Services ──────────────────────────────────────────────────────────────────
 builder.Services.AddControllers()
     .AddJsonOptions(opts =>
     {
@@ -27,21 +33,22 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddOpenApi();
-
-// SignalR (built into ASP.NET Core 9)
 builder.Services.AddSignalR();
 
-// EF Core + SQLite
+// SQLite — ephemeral for demos (resets on redeploy), fine for hackathon
 builder.Services.AddDbContext<SaderDbContext>(opts =>
     opts.UseSqlite("Data Source=sader.db"));
 
-// CORS — allow React dev server
+// CORS: dev allows localhost; prod serves React from same origin so CORS is a non-issue
 builder.Services.AddCors(opts =>
     opts.AddDefaultPolicy(p =>
-        p.WithOrigins("http://localhost:3000", "http://localhost:5173")
-         .AllowAnyHeader()
-         .AllowAnyMethod()
-         .AllowCredentials()));
+    {
+        if (builder.Environment.IsDevelopment())
+            p.WithOrigins("http://localhost:3000", "http://localhost:5173")
+             .AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+        else
+            p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    }));
 
 // STEP Agents
 builder.Services.AddSingleton(new ClaudeService(claudeApiKey));
@@ -63,12 +70,10 @@ builder.Services.AddSingleton(sp =>
         sp.GetRequiredService<LogisticsAgent>(),
         sp.GetRequiredService<ConsensusEngine>()));
 
-// SignalR broadcaster (Scoped — safe inside IServiceScope)
 builder.Services.AddScoped<StepBroadcaster>();
-// Singleton accessor for background tasks that need HubContext without scope
 builder.Services.AddSingleton<IHubContextAccessor, HubContextAccessor>();
 
-// ── Build & Migrate ──────────────────────────────────────────────────────────
+// ── Build & Migrate ───────────────────────────────────────────────────────────
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -84,7 +89,14 @@ if (app.Environment.IsDevelopment())
 app.UseCors();
 app.UseAuthorization();
 
+// Serve the Vite-built React app from wwwroot (production)
+app.UseDefaultFiles();  // serves index.html for /
+app.UseStaticFiles();   // serves JS / CSS / assets
+
 app.MapControllers();
 app.MapHub<StepHub>("/hubs/step");
+
+// SPA fallback — any unknown route returns index.html for client-side routing
+app.MapFallbackToFile("index.html");
 
 app.Run();
